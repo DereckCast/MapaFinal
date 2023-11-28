@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registro Usuario</title>
+    <style>
+
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            
+        }
+        .form-register{
+            width: 400px;
+            background: #24303c;
+            padding: 30px;
+            margin: auto;
+            margin-top: 100px;
+            border-radius: 4px;
+            font-family:'calibri';
+            color: white;
+            box-shadow: 7px 13px 37px #000;
+        }
+        .form-register h4{
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        .controls{
+            width: 100%;
+            background: #24303c;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            border: 1px solid #1f53c5;
+            font-family:'calibri';
+            font-size: 18px;
+            color: white;
+        }
+        .form-register p {
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .form-register a{
+            color: white;
+            text-decoration: underline;
+
+        }
+        .form-register .botons {
+            width: 100%;
+            background: #1f53c5;
+            border: none;
+            padding: 12px;
+            color: white;
+            margin: 16px 0;
+
+        }
+    </style>
+</head>
+<body>
+<h:form>
+    <p:panelGrid columns="1" styleClass="form-register">
+        <h:outputText value="Registro De Sesión" styleClass="form-register-header" />
+        <p:inputText value="#{usuarioBean.nombres}" styleClass="controls" placeholder="Ingrese su nombre" />
+        <p:inputText value="#{usuarioBean.apellido}" styleClass="controls" placeholder="Ingrese su apellido" />
+        <p:inputText value="#{usuarioBean.usuario}" styleClass="controls" placeholder="Ingrese su nombre de usuario" />
+        <p:inputText value="#{usuarioBean.cif}" styleClass="controls" placeholder="Ingrese su CIF" />
+        <p:inputText value="#{usuarioBean.correo}" styleClass="controls" placeholder="Ingrese su correo" />
+        <p:password value="#{usuarioBean.contrasenia}" styleClass="controls" placeholder="Ingrese su contraseña" />
+        <p:commandButton value="Registrarse" styleClass="botons" action="#{usuarioBean.redirectMapa}" />
+        <h:outputText value="¿Ya tengo cuenta?" styleClass="form-register-link" />
+        <p:link outcome="login.xhtml" value="Ir al inicio de sesión" styleClass="form-register-link" />
+    </p:panelGrid>
+</h:form>
+</body>
+</html>
