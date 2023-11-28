@@ -72,6 +72,27 @@
         <input class="botons" type="button" value="Registrarse" onclick="redirectMapa()">
         <p><a href="login.html">¿Ya tengo cuenta?</a></p>
     </section>
-    
+    <script>
+    function redirectMapa() {
+            // Obtener los valores de los campos si es necesario
+            var nombres = document.getElementById('nombres').value;
+            var apellido = document.getElementById('Apellido').value;
+            var usuario = document.getElementById('Usuario').value;
+            var cif = document.getElementById('Cif').value;
+            var correo = document.getElementById('Correo').value;
+            var contrasenia = document.getElementById('Contrasenia').value;
+
+            // Verificar que todos los campos estén llenos
+            if (nombres && apellido && usuario && cif && correo && contrasenia) {
+                // Realizar cualquier procesamiento adicional con los valores obtenidos
+                // ...
+
+                // Redirigir a Mapa.html
+                window.location.href = 'Mapa.html';
+            } else {
+                alert('Por favor, complete todos los campos antes de registrarse.');
+            }
+        }
+    </script>
 </body>
 </html>
