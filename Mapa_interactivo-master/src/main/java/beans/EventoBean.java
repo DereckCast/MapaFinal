@@ -13,7 +13,7 @@ import service.ImplIDAO;
 
 import java.io.Serializable;
 
-@Named
+@Named("eventoBean")
 @ViewScoped
 @Getter
 @Setter
