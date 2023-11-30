@@ -33,7 +33,7 @@ public class UsuarioBean implements Serializable {
         try {
             // Inserta el nuevo usuario en la base de datos
             dao.insert(usuario);
-            return "evemto.xhtml";
+            return "evento.xhtml";
         } catch (Exception e) {
             // Manejo de excepciones y rollback
             e.printStackTrace();

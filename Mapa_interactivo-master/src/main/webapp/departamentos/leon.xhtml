@@ -58,28 +58,6 @@
     </h:head>
     <h:body>
 
-        <p:dialog header="Crear Marcador" widgetVar="dlg2" modal="true" showEffect="fade">
-            <h:form id="markerForm">
-                <h:panelGrid columns="2">
-                    <h:outputLabel for="markerName" value="Nombre del Marcador:"/>
-                    <p:inputText id="markerName" value="#{eventoBean.eventos.nombre}" required="true"/>
-
-                    <h:outputLabel for="markerDescription" value="Descripción del Marcador:"/>
-                    <p:inputText id="markerDescription" value="#{eventoBean.eventos.descripcion}" required="true"/>
-
-                    <h:outputLabel for="markerLocation" value="Localización del Marcador:"/>
-                    <p:inputText id="markerLocation" value="#{eventoBean.eventos.local}" required="true"/>
-
-                    <h:outputLabel for="markerDate" value="Fecha del Marcador:"/>
-                    <p:calendar id="markerDate" value="#{eventoBean.eventos.fecha_final}" required="true"/>
-                </h:panelGrid>
-
-                <p:commandButton value="Guardar Marcador" action="#{eventoBean.guardarMarcador}"
-                                 oncomplete="PF('dlg2').hide(); guardarMarcador();" />
-
-            </h:form>
-        </p:dialog>
-
         <div id="mi_mapa"></div>
 
         <script src="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet-src.min.js"></script>
@@ -99,13 +77,8 @@
             }
 
             function guardarMarcador() {
-                addMarker(
-                    eventoBean.eventos.latlng,
-                    eventoBean.eventos.nombre,
-                    eventoBean.eventos.descripcion,
-                    eventoBean.eventos.local,
-                    eventoBean.eventos.fecha_final
-                );
+                // Puedes enviar la lista de marcadores al servidor aquí (markers)
+                console.log(markers);
                 localStorage.setItem('markers', JSON.stringify(markers));
             }
 
@@ -114,15 +87,30 @@
                 addMarker(marker.latlng, marker.name);
             });
 
-
             map.on('click', function (e) {
-                PF('dlg2').show();
-                eventoBean.eventos.latlng = e.latlng;
-                eventoBean.eventos.nombre = '';
-                eventoBean.eventos.descripcion = '';
-                eventoBean.eventos.local = '';
-                eventoBean.eventos.fecha_final = '';
+                var markerName = prompt('Ingrese el nombre del marcador:');
+                if (markerName) {
+                    addMarker(e.latlng, markerName);
+                    guardarMarcador();
+
+                    // Actualizar el bean en el servidor usando AJAX (ejemplo con PrimeFaces)
+                    actualizarNombreEnBean(markerName);
+                }
             });
+
+            function actualizarNombreEnBean(nombre) {
+                // Utiliza PrimeFaces para actualizar el bean en el servidor
+                PrimeFaces.ajax.AjaxRequest('/updateBean', {
+                    formId: 'formId', // ID de tu formulario JSF
+                    // Otros parámetros que puedas necesitar
+                    params: {
+                        'eventoBean.eventos.nombre': nombre
+                    },
+                    onsuccess: function () {
+                        console.log('Nombre actualizado en el bean');
+                    }
+                });
+            }
 
             var geocoder = L.Control.geocoder({
                 defaultMarkGeocode: false,

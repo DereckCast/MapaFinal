@@ -1,5 +1,6 @@
 package beans;
 
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 import lombok.Getter;
@@ -48,18 +49,14 @@ public class EventoBean implements Serializable {
 
         PrimeFaces.current().dialog().openDynamic("form", options, null);
     }
-    public String guardarMarcador (){
-        try {
-            // Inserta el nuevo usuario en la base de datos
-            dao.insert(eventos);
+    public void guardarMarcador() {
+        // Obtener el nombre del marcador del parámetro
+        String nombreMarcador = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("nombreMarcador");
 
-        } catch (Exception e) {
-            // Manejo de excepciones y rollback
-            e.printStackTrace();
-            return "registro.xhtml";
-        }
+        // Puedes hacer lo que quieras con el nombreMarcador, por ejemplo, asignarlo al atributo nombre de tu objeto Evento
+        eventos.setNombre(nombreMarcador);
 
-        return null;
+        dao.insert(eventos);
     }
 
 
