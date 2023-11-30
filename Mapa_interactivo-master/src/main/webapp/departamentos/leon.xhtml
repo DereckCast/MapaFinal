@@ -5,108 +5,139 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://java.sun.com/jsf/core">
 <f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
-<h:head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mapa con Buscador</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.css" />
+    <h:head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>Mapa con Buscador</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet.min.css"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.css"/>
 
-    <style>
-        html, body {
-            padding: 0;
-            margin: 0;
-            height: 100%;
-        }
+        <style>
+            html, body {
+                padding: 0;
+                margin: 0;
+                height: 100%;
+            }
 
-        body {
-            display: flex;
-            flex-direction: column;
-        }
+            body {
+                display: flex;
+                flex-direction: column;
+            }
 
-        #mi_mapa {
-            flex-grow: 1;
-            height: 600px; /* Ajusta la altura según tus necesidades */
-        }
+            #mi_mapa {
+                flex-grow: 1;
+                height: 600px; /* Ajusta la altura según tus necesidades */
+            }
 
-        .button {
-            background-color: #04AA6D;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-        }
+            .button {
+                background-color: #04AA6D;
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+            }
 
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-        }
+            .button-container {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+            }
 
-        .search-bar {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: center;
-        }
-    </style>
-</h:head>
-<h:body>
+            .search-bar {
+                margin-top: 10px;
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: center;
+            }
+        </style>
+    </h:head>
+    <h:body>
 
-    <h:form id="form">
-        <div class="card">
-            <p:commandButton value="Crear un evento" styleClass="button"  onclick="PF('dlg1').show()"/>
-
-            <p:dialog header="Crear Evento" widgetVar="dlg1" modal="true" showEffect="fade">
+        <p:dialog header="Crear Marcador" widgetVar="dlg2" modal="true" showEffect="fade">
+            <h:form id="markerForm">
                 <h:panelGrid columns="2">
-                    <h:outputLabel for="eventName" value="Nombre del Evento:" />
-                    <p:inputText id="eventName" value="#{eventoBean.eventos.nombre}" required="true" />
+                    <h:outputLabel for="markerName" value="Nombre del Marcador:"/>
+                    <p:inputText id="markerName" value="#{eventoBean.eventos.nombre}" required="true"/>
 
-                    <h:outputLabel for="eventLocation" value="Lugar del Evento:" />
-                    <p:inputText id="eventLocation" value="#{eventoBean.eventos.organizador}" required="true" />
+                    <h:outputLabel for="markerDescription" value="Descripción del Marcador:"/>
+                    <p:inputText id="markerDescription" value="#{eventoBean.eventos.descripcion}" required="true"/>
+
+                    <h:outputLabel for="markerLocation" value="Localización del Marcador:"/>
+                    <p:inputText id="markerLocation" value="#{eventoBean.eventos.local}" required="true"/>
+
+                    <h:outputLabel for="markerDate" value="Fecha del Marcador:"/>
+                    <p:calendar id="markerDate" value="#{eventoBean.eventos.fecha_final}" required="true"/>
                 </h:panelGrid>
 
-                <p:commandButton value="Guardar" action="#{eventoBean.guardarEvento}" update="form" oncomplete="PF('dlg1').hide()" />
-            </p:dialog>
-        </div>
-    </h:form>
+                <p:commandButton value="Guardar Marcador" action="#{eventoBean.guardarMarcador}"
+                                 oncomplete="PF('dlg2').hide(); guardarMarcador();" />
 
-<div id="mi_mapa"></div>
+            </h:form>
+        </p:dialog>
 
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet-src.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.js"></script>
+        <div id="mi_mapa"></div>
 
-<script>
+        <script src="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet-src.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.js"></script>
+
+        <script>
+            var map = L.map('mi_mapa').setView([12.43516, -86.87864], 18);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: "&#169; &lt;a href='https://www.openstreetmap.org/copyright'>OpenStreetMap&lt;/a> contributors"
+            }).addTo(map);
+
+            var markers = JSON.parse(localStorage.getItem('markers')) || [];
+
+            function addMarker(latlng, name) {
+                var marker = L.marker(latlng).addTo(map).bindPopup(name);
+                markers.push({ name: name, latlng: latlng });
+            }
+
+            function guardarMarcador() {
+                addMarker(
+                    eventoBean.eventos.latlng,
+                    eventoBean.eventos.nombre,
+                    eventoBean.eventos.descripcion,
+                    eventoBean.eventos.local,
+                    eventoBean.eventos.fecha_final
+                );
+                localStorage.setItem('markers', JSON.stringify(markers));
+            }
+
+            // Agregar marcadores existentes
+            markers.forEach(function (marker) {
+                addMarker(marker.latlng, marker.name);
+            });
 
 
-    let map = L.map('mi_mapa').setView([12.43516,-86.87864], 18);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: "&#169; &lt;a href='https://www.openstreetmap.org/copyright'>OpenStreetMap&lt;/a> contributors"
-    }).addTo(map);
+            map.on('click', function (e) {
+                PF('dlg2').show();
+                eventoBean.eventos.latlng = e.latlng;
+                eventoBean.eventos.nombre = '';
+                eventoBean.eventos.descripcion = '';
+                eventoBean.eventos.local = '';
+                eventoBean.eventos.fecha_final = '';
+            });
 
-    L.marker([12.4372,-86.8767]).addTo(map)
-        .bindPopup('Evento de Robotica en UAM')
-        .openPopup();
-
-    var geocoder = L.Control.geocoder({
-        defaultMarkGeocode: false,
-        placeholder: "Buscar dirección...",
-    }).on('markgeocode', function (e) {
-        var bbox = e.geocode.bbox;
-        var poly = L.polygon([
-            bbox.getSouthEast(),
-            bbox.getNorthEast(),
-            bbox.getNorthWest(),
-            bbox.getSouthWest()
-        ]).addTo(map);
-        map.fitBounds(poly.getBounds());
-    }).addTo(map);
-</script>
-</h:body>
+            var geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+                placeholder: "Buscar dirección...",
+            }).on('markgeocode', function (e) {
+                var bbox = e.geocode.bbox;
+                var poly = L.polygon([
+                    bbox.getSouthEast(),
+                    bbox.getNorthEast(),
+                    bbox.getNorthWest(),
+                    bbox.getSouthWest()
+                ]).addTo(map);
+                map.fitBounds(poly.getBounds());
+            }).addTo(map);
+        </script>
+    </h:body>
 </f:view>
 </html>

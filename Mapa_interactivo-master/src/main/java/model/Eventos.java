@@ -10,19 +10,32 @@ public class Eventos {
     @Id
     private Integer id;
     private String nombre;
-    private Date fecha_inicio;
-    private Date fecha_final;
-    private int hora_inicio;
-    private int hora_final;
+    private String fecha_final;
+    private double latlng;
 
     private String organizador;
     private String descripcion;
-    private char estado;
-    private char contacto;
-    private String correo_contacto;
-    private char contacto_pais;
+
+    private String local;
 
 
+    // Getters y Setters
+
+    public double getLatlng() {
+        return latlng;
+    }
+
+    public void setLatlng(double latlng) {
+        this.latlng = latlng;
+    }
+
+    public String getLocal() {
+        return local;
+    }
+
+    public void setLocal(String local) {
+        this.local = local;
+    }
 
     public Integer getId() {
         return id;
@@ -40,37 +53,16 @@ public class Eventos {
         this.nombre = nombre;
     }
 
-    public Date getFecha_inicio() {
-        return fecha_inicio;
-    }
 
-    public void setFecha_inicio(Date fecha_inicio) {
-        this.fecha_inicio = fecha_inicio;
-    }
-
-    public Date getFecha_final() {
+    public String getFecha_final() {
         return fecha_final;
     }
 
-    public void setFecha_final(Date fecha_final) {
+    public void setFecha_final(String fecha_final) {
         this.fecha_final = fecha_final;
     }
 
-    public int getHora_inicio() {
-        return hora_inicio;
-    }
 
-    public void setHora_inicio(int hora_inicio) {
-        this.hora_inicio = hora_inicio;
-    }
-
-    public int getHora_final() {
-        return hora_final;
-    }
-
-    public void setHora_final(int hora_final) {
-        this.hora_final = hora_final;
-    }
 
     public String getOrganizador() {
         return organizador;
@@ -88,37 +80,7 @@ public class Eventos {
         this.descripcion = descripcion;
     }
 
-    public char getEstado() {
-        return estado;
-    }
 
-    public void setEstado(char estado) {
-        this.estado = estado;
-    }
-
-    public char getContacto() {
-        return contacto;
-    }
-
-    public void setContacto(char contacto) {
-        this.contacto = contacto;
-    }
-
-    public String getCorreo_contacto() {
-        return correo_contacto;
-    }
-
-    public void setCorreo_contacto(String correo_contacto) {
-        this.correo_contacto = correo_contacto;
-    }
-
-    public char getContacto_pais() {
-        return contacto_pais;
-    }
-
-    public void setContacto_pais(char contacto_pais) {
-        this.contacto_pais = contacto_pais;
-    }
 }
 
 

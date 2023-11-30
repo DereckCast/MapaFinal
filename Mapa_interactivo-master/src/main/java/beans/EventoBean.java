@@ -5,7 +5,6 @@ import jakarta.inject.Named;
 import lombok.Getter;
 import lombok.Setter;
 import model.Eventos;
-import model.Usuario;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.DialogFrameworkOptions;
 import service.IDAO;
@@ -22,12 +21,24 @@ public class EventoBean implements Serializable {
 
     @Getter
     private Eventos eventos = new Eventos();
+    private static final long serialVersionUID = 1L;
 
     public void setEventos(Eventos eventos) {
         this.eventos = eventos;
     }
-    public void guardarEvento(){
 
+    public String guardarEvento(){
+        try {
+            // Inserta el nuevo usuario en la base de datos
+            dao.insert(eventos);
+
+        } catch (Exception e) {
+            // Manejo de excepciones y rollback
+            e.printStackTrace();
+            return "registro.xhtml";
+        }
+
+        return null;
     }
     public void viewProducts(){
         DialogFrameworkOptions options = DialogFrameworkOptions.builder()
@@ -37,5 +48,19 @@ public class EventoBean implements Serializable {
 
         PrimeFaces.current().dialog().openDynamic("form", options, null);
     }
+    public String guardarMarcador (){
+        try {
+            // Inserta el nuevo usuario en la base de datos
+            dao.insert(eventos);
+
+        } catch (Exception e) {
+            // Manejo de excepciones y rollback
+            e.printStackTrace();
+            return "registro.xhtml";
+        }
+
+        return null;
+    }
+
 
 }
