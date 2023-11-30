@@ -5,108 +5,127 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://java.sun.com/jsf/core">
 <f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
-<h:head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mapa con Buscador</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.css" />
+    <h:head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>Mapa con Buscador</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet.min.css"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.css"/>
 
-    <style>
-        html, body {
-            padding: 0;
-            margin: 0;
-            height: 100%;
-        }
+        <style>
+            html, body {
+                padding: 0;
+                margin: 0;
+                height: 100%;
+            }
 
-        body {
-            display: flex;
-            flex-direction: column;
-        }
+            body {
+                display: flex;
+                flex-direction: column;
+            }
 
-        #mi_mapa {
-            flex-grow: 1;
-            height: 600px; /* Ajusta la altura según tus necesidades */
-        }
+            #mi_mapa {
+                flex-grow: 1;
+                height: 600px; /* Ajusta la altura según tus necesidades */
+            }
 
-        .button {
-            background-color: #04AA6D;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-        }
+            .button {
+                background-color: #04AA6D;
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+            }
 
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-        }
+            .button-container {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+            }
 
-        .search-bar {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: center;
-        }
-    </style>
-</h:head>
-<h:body>
+            .search-bar {
+                margin-top: 10px;
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: center;
+            }
+        </style>
+    </h:head>
+    <h:body>
 
-    <h:form id="form">
-        <div class="card">
-            <p:commandButton value="Crear un evento" styleClass="button"  onclick="PF('dlg1').show()"/>
+        <div id="mi_mapa"></div>
 
-            <p:dialog header="Crear Evento" widgetVar="dlg1" modal="true" showEffect="fade">
-                <h:panelGrid columns="2">
-                    <h:outputLabel for="eventName" value="Nombre del Evento:" />
-                    <p:inputText id="eventName" value="#{eventoBean.eventos.nombre}" required="true" />
+        <script src="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet-src.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.js"></script>
 
-                    <h:outputLabel for="eventLocation" value="Lugar del Evento:" />
-                    <p:inputText id="eventLocation" value="#{eventoBean.eventos.organizador}" required="true" />
-                </h:panelGrid>
+        <script>
+            var map = L.map('mi_mapa').setView([11.6493,-86.3410], 18);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: "&#169; &lt;a href='https://www.openstreetmap.org/copyright'>OpenStreetMap&lt;/a> contributors"
+            }).addTo(map);
 
-                <p:commandButton value="Guardar" action="#{eventoBean.guardarEvento}" update="form" oncomplete="PF('dlg1').hide()" />
-            </p:dialog>
-        </div>
-    </h:form>
+            var markers = JSON.parse(localStorage.getItem('markers')) || [];
 
-<div id="mi_mapa"></div>
+            function addMarker(latlng, name) {
+                var marker = L.marker(latlng).addTo(map).bindPopup(name);
+                markers.push({ name: name, latlng: latlng });
+            }
 
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet-src.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.js"></script>
+            function guardarMarcador() {
+                // Puedes enviar la lista de marcadores al servidor aquí (markers)
+                console.log(markers);
+                localStorage.setItem('markers', JSON.stringify(markers));
+            }
 
-<script>
+            // Agregar marcadores existentes
+            markers.forEach(function (marker) {
+                addMarker(marker.latlng, marker.name);
+            });
 
+            map.on('click', function (e) {
+                var markerName = prompt('Ingrese el nombre del marcador:');
+                if (markerName) {
+                    addMarker(e.latlng, markerName);
+                    guardarMarcador();
 
-    let map = L.map('mi_mapa').setView([11.6493,-86.3410], 16);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: "&#169; &lt;a href='https://www.openstreetmap.org/copyright'>OpenStreetMap&lt;/a> contributors"
-    }).addTo(map);
+                    // Actualizar el bean en el servidor usando AJAX (ejemplo con PrimeFaces)
+                    actualizarNombreEnBean(markerName);
+                }
+            });
 
-    /*L.marker([12.4372,-86.8767]).addTo(map)
-        .bindPopup('Evento de Robotica en UAM')
-        .openPopup();*/
+            function actualizarNombreEnBean(nombre) {
+                // Utiliza PrimeFaces para actualizar el bean en el servidor
+                PrimeFaces.ajax.AjaxRequest('/updateBean', {
+                    formId: 'formId', // ID de tu formulario JSF
+                    // Otros parámetros que puedas necesitar
+                    params: {
+                        'eventoBean.eventos.nombre': nombre
+                    },
+                    onsuccess: function () {
+                        console.log('Nombre actualizado en el bean');
+                    }
+                });
+            }
 
-    var geocoder = L.Control.geocoder({
-        defaultMarkGeocode: false,
-        placeholder: "Buscar dirección...",
-    }).on('markgeocode', function (e) {
-        var bbox = e.geocode.bbox;
-        var poly = L.polygon([
-            bbox.getSouthEast(),
-            bbox.getNorthEast(),
-            bbox.getNorthWest(),
-            bbox.getSouthWest()
-        ]).addTo(map);
-        map.fitBounds(poly.getBounds());
-    }).addTo(map);
-</script>
-</h:body>
+            var geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+                placeholder: "Buscar dirección...",
+            }).on('markgeocode', function (e) {
+                var bbox = e.geocode.bbox;
+                var poly = L.polygon([
+                    bbox.getSouthEast(),
+                    bbox.getNorthEast(),
+                    bbox.getNorthWest(),
+                    bbox.getSouthWest()
+                ]).addTo(map);
+                map.fitBounds(poly.getBounds());
+            }).addTo(map);
+        </script>
+    </h:body>
 </f:view>
 </html>

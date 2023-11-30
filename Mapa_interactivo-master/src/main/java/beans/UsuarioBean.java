@@ -37,20 +37,27 @@ public class UsuarioBean implements Serializable {
         } catch (Exception e) {
             // Manejo de excepciones y rollback
             e.printStackTrace();
-            return "registro.xhtml";
+            return "evento.xhtml";
         }
     }
-    // En la clase UsuarioBean
     public String redirectInicio() {
-        List<Usuario> usuarios = dao.get("findByNomUsuarioAndContrasenia", Usuario.class, inputNomUsuario, inputContrasenia);
+        try {
+            // Buscar el usuario en la base de datos
+            List<Usuario> usuarios = dao.getAll("Usuario.findByUsernameAndPassword", Usuario.class, inputNomUsuario, inputContrasenia);
 
-        if (!usuarios.isEmpty()) {
-            // Usuario autenticado, puedes redirigir a la página deseada
-            return "mapa.xhtml";
-        } else {
-
-            return "home.xhtml";
+            if (!usuarios.isEmpty()) {
+                // Usuario encontrado, redirigir a la página evento.xhtml
+                return "evento.xhtml";
+            } else {
+                // Usuario no encontrado, mostrar mensaje de datos incorrectos
+                return "datosIncorrectos.xhtml";  // Reemplaza "datosIncorrectos.xhtml" con la página que desees mostrar el mensaje de datos incorrectos
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones
+            e.printStackTrace();
+            return "login.xhtml";  // Reemplaza "error.xhtml" con la página que desees mostrar en caso de error
         }
     }
+
 
 }

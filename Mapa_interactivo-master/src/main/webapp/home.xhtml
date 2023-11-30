@@ -8,17 +8,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Inicio</title>
     <style>
+        html, body {
+            width: 100%;
+            height:100%;
+        }
         body {
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #000000;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
             font-family: consolas;
         }
         h2{
-            background: white;
+            font-size: 2em;
+        }
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .logo-container {
@@ -126,10 +143,10 @@
     <br />
     <br />
     <div class="btn-container">
-        <p:commandButton value="Inicio de sesión" action="mapa.xhtml" styleClass="btn-neon">
+        <p:commandButton value="Inicio de sesión" action="login.xhtml" styleClass="btn-neon">
             <f:ajax />
         </p:commandButton>
-        <p:commandButton value="Registrarse" action="leon.xhtml" styleClass="btn-neon">
+        <p:commandButton value="Registrarse" action="registro.xhtml" styleClass="btn-neon">
             <f:ajax />
         </p:commandButton>
     </div>

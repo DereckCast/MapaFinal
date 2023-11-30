@@ -2,14 +2,13 @@ package service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import model.Usuario;
 
 
 import java.util.List;
 
 public class ImplIDAO implements IDAO{
     @Override
-    public <T> List<T> getAll(String nameQuery, Class<T> clazz) {
+    public <T> List<T> getAll(String nameQuery, Class<T> clazz, String inputNomUsuario, String inputContrasenia) {
         EntityManager em = EntityManagerAdmin.getInstance();
         try {
             TypedQuery<T> query = em.createNamedQuery(nameQuery,clazz);
