@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+<f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
+<h:head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mapa con Buscador</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.css" />
+
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #mi_mapa {
+            flex-grow: 1;
+            height: 600px; /* Ajusta la altura según tus necesidades */
+        }
+
+        .button {
+            background-color: #04AA6D;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .search-bar {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</h:head>
+<h:body>
+
+    <h:form id="form">
+        <div class="card">
+            <p:commandButton value="Crear un evento" styleClass="button"  onclick="PF('dlg1').show()"/>
+
+            <p:dialog header="Crear Evento" widgetVar="dlg1" modal="true" showEffect="fade">
+                <h:panelGrid columns="2">
+                    <h:outputLabel for="eventName" value="Nombre del Evento:" />
+                    <p:inputText id="eventName" value="#{eventoBean.eventos.nombre}" required="true" />
+
+                    <h:outputLabel for="eventLocation" value="Lugar del Evento:" />
+                    <p:inputText id="eventLocation" value="#{eventoBean.eventos.organizador}" required="true" />
+                </h:panelGrid>
+
+                <p:commandButton value="Guardar" action="#{eventoBean.guardarEvento}" update="form" oncomplete="PF('dlg1').hide()" />
+            </p:dialog>
+        </div>
+    </h:form>
+
+<div id="mi_mapa"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet-src.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2/dist/Control.Geocoder.min.js"></script>
+
+<script>
+
+
+    let map = L.map('mi_mapa').setView([11.9307,-85.9553], 16);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: "&#169; &lt;a href='https://www.openstreetmap.org/copyright'>OpenStreetMap&lt;/a> contributors"
+    }).addTo(map);
+
+    /*L.marker([12.4372,-86.8767]).addTo(map)
+        .bindPopup('Evento de Robotica en UAM')
+        .openPopup();*/
+
+    var geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false,
+        placeholder: "Buscar dirección...",
+    }).on('markgeocode', function (e) {
+        var bbox = e.geocode.bbox;
+        var poly = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest()
+        ]).addTo(map);
+        map.fitBounds(poly.getBounds());
+    }).addTo(map);
+</script>
+</h:body>
+</f:view>
+</html>
